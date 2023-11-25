@@ -120,18 +120,47 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Cargamos las matrices de datos</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>lista_animales <span class="ot">=</span> <span class="fu">read.table</span>(<span class="st">"fileListANIMAL_phylum.txt"</span>)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>datos_VH <span class="ot">=</span> <span class="fu">read.table</span>(<span class="st">"ANIMALS-matrixVH.txt"</span>)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>datos_SP <span class="ot">=</span> <span class="fu">read.table</span>(<span class="st">"ANIMALS-matrixSP.txt"</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>datos_PM <span class="ot">=</span> <span class="fu">read.table</span>(<span class="st">"ANIMALS-matrixPM.txt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>nombres <span class="ot">=</span> lista_animales[,<span class="dv">1</span>]</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>phylum <span class="ot">=</span> lista_animales[,<span class="dv">2</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>datos_VH <span class="ot">=</span> <span class="fu">read.table</span>(<span class="st">"ANIMALS-matrixVH.txt"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(datos_VH) <span class="ot">=</span> nombres</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(datos_VH) <span class="ot">=</span> nombres</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>datos_SP <span class="ot">=</span> <span class="fu">read.table</span>(<span class="st">"ANIMALS-matrixSP.txt"</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(datos_SP) <span class="ot">=</span> nombres</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(datos_SP) <span class="ot">=</span> nombres</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>datos_PM <span class="ot">=</span> <span class="fu">read.table</span>(<span class="st">"ANIMALS-matrixPM.txt"</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(datos_PM) <span class="ot">=</span> nombres</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="fu">rownames</span>(datos_PM) <span class="ot">=</span> nombres</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>phylum.mds<span class="ot">&lt;-</span><span class="fu">cmdscale</span>(datos_VH,<span class="at">k=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rh.phylum.mds<span class="ot">&lt;-</span><span class="fu">cmdscale</span>(datos_VH,<span class="at">k=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Con el resultado del análisis de MDS, creamos el siguiente data frame añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>df_rh.phylum.mds <span class="ot">=</span> <span class="fu">cbind</span>(<span class="fu">data.frame</span>(rh.phylum.mds), <span class="fu">as.factor</span>(phylum))</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(df_rh.phylum.mds) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">"X"</span>, <span class="st">"Y"</span>, <span class="st">"phylum"</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(df_rh.phylum.mds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 370
+Columns: 3
+$ X      &lt;dbl&gt; -3.928304e-09, -2.002171e-09, -4.418786e-09, -3.966659e-09, -3.…
+$ Y      &lt;dbl&gt; 9.968058e-11, -2.730010e-09, 9.601433e-11, 1.383298e-10, -8.274…
+$ phylum &lt;fct&gt; 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101, 101…</code></pre>
+</div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(phylum.mds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_rh.phylum.mds<span class="sc">$</span>X, df_rh.phylum.mds<span class="sc">$</span>Y, <span class="at">pch =</span> <span class="dv">19</span>, <span class="at">col =</span> <span class="fu">factor</span>(df_rh.phylum.mds<span class="sc">$</span>phylum), <span class="at">xlab =</span> <span class="st">"Dim.1"</span>, <span class="at">ylab =</span> <span class="st">"Dim.2"</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">legend</span>(<span class="st">"topleft"</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>       <span class="at">legend =</span> <span class="fu">levels</span>(<span class="fu">factor</span>(df_rh.phylum.mds<span class="sc">$</span>phylum)),</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">pch =</span> <span class="dv">19</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">cex =</span> <span class="fl">0.7</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>       <span class="at">col =</span> <span class="fu">factor</span>(<span class="fu">levels</span>(<span class="fu">factor</span>(df_rh.phylum.mds<span class="sc">$</span>phylum))))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img src="Entrega5_AD_MDS_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<p><img src="Entrega5_AD_MDS_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 </section>

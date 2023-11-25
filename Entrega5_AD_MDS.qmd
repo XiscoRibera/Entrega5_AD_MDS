@@ -37,20 +37,43 @@ Cargamos las matrices de datos
 
 ```{r}
 lista_animales = read.table("fileListANIMAL_phylum.txt")
+nombres = lista_animales[,1]
+phylum = lista_animales[,2]
+
 datos_VH = read.table("ANIMALS-matrixVH.txt")
+colnames(datos_VH) = nombres
+rownames(datos_VH) = nombres
+
 datos_SP = read.table("ANIMALS-matrixSP.txt")
+colnames(datos_SP) = nombres
+rownames(datos_SP) = nombres
+
 datos_PM = read.table("ANIMALS-matrixPM.txt")
+colnames(datos_PM) = nombres
+rownames(datos_PM) = nombres
 ```
 
 Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
 
 ```{r}
-phylum.mds<-cmdscale(datos_VH,k=2)
+rh.phylum.mds<-cmdscale(datos_VH,k=2)
 ```
 
+Con el resultado del análisis de MDS, creamos el siguiente data frame añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles).
 
 ```{r}
-plot(phylum.mds)
+df_rh.phylum.mds = cbind(data.frame(rh.phylum.mds), as.factor(phylum))
+colnames(df_rh.phylum.mds) = c("X", "Y", "phylum")
+glimpse(df_rh.phylum.mds)
+```
+
+```{r}
+plot(df_rh.phylum.mds$X, df_rh.phylum.mds$Y, pch = 19, col = factor(df_rh.phylum.mds$phylum), xlab = "Dim.1", ylab = "Dim.2")
+legend("topleft",
+       legend = levels(factor(df_rh.phylum.mds$phylum)),
+       pch = 19,
+       cex = 0.7,
+       col = factor(levels(factor(df_rh.phylum.mds$phylum))))
 ```
 
 
