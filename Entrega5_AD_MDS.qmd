@@ -18,3 +18,40 @@ editor: visual
 - **PM (Pyramid Match): mide la similitud de las características topológicas (por ejemplo, la conectividad) de los nodos con la misma etiqueta en los dos grafos comparados.**
 
 **La práctica consiste en representar gráficamente (con solo 2 coordenadas principales) las matrices de similitud generadas por cada kernel coloreando los puntos de acuerdo al grupo de animales de acuerdo a su phylum.**
+
+
+
+
+
+# Datos
+
+Cargamos las librerías
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(mds)
+```
+
+Cargamos las matrices de datos
+
+```{r}
+lista_animales = read.table("fileListANIMAL_phylum.txt")
+datos_VH = read.table("ANIMALS-matrixVH.txt")
+datos_SP = read.table("ANIMALS-matrixSP.txt")
+datos_PM = read.table("ANIMALS-matrixPM.txt")
+```
+
+Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
+
+```{r}
+phylum.mds<-cmdscale(datos_VH,k=2)
+```
+
+
+```{r}
+plot(phylum.mds)
+```
+
+
+
