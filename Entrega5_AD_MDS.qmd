@@ -53,10 +53,18 @@ colnames(datos_PM) = nombres
 rownames(datos_PM) = nombres
 ```
 
+
+Puesto que nos dan la matriz de disimilaridad, vamos a convertirla en una matatriz de distancias.
+
+```{r}
+dist_VH <- sqrt(2*(1-datos_VH))
+```
+
+
 Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
 
 ```{r}
-rh.phylum.mds<-cmdscale(datos_VH,k=2)
+rh.phylum.mds<-cmdscale(dist_VH,k=2)
 ```
 
 Con el resultado del análisis de MDS, creamos el siguiente data frame añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles).
