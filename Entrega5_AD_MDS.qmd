@@ -54,7 +54,7 @@ rownames(datos_PM) = nombres
 ```
 
 
-Puesto que nos dan la matriz de disimilaridad, vamos a convertirla en una matatriz de distancias.
+Puesto que nos dan la matriz de similaridad, vamos a convertirla en una matatriz de distancias.
 
 ```{r}
 dist_VH <- sqrt(2*(1-datos_VH))
@@ -64,25 +64,35 @@ dist_VH <- sqrt(2*(1-datos_VH))
 Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
 
 ```{r}
-rh.phylum.mds<-cmdscale(dist_VH,k=2)
+vh.phylum.mds<-cmdscale(dist_VH,k=2)
 ```
 
 Con el resultado del análisis de MDS, creamos el siguiente data frame añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles).
 
 ```{r}
-df_rh.phylum.mds = cbind(data.frame(rh.phylum.mds), as.factor(phylum))
-colnames(df_rh.phylum.mds) = c("X", "Y", "phylum")
-glimpse(df_rh.phylum.mds)
+df_vh.phylum.mds = cbind(data.frame(vh.phylum.mds), as.factor(phylum))
+colnames(df_vh.phylum.mds) = c("X", "Y", "phylum")
+glimpse(df_vh.phylum.mds)
 ```
 
 ```{r}
-plot(df_rh.phylum.mds$X, df_rh.phylum.mds$Y, pch = 19, col = factor(df_rh.phylum.mds$phylum), xlab = "Dim.1", ylab = "Dim.2")
+plot(df_vh.phylum.mds$X, df_vh.phylum.mds$Y, pch = 19, col = factor(df_vh.phylum.mds$phylum), xlab = "Dim.1", ylab = "Dim.2")
 legend("topleft",
-       legend = levels(factor(df_rh.phylum.mds$phylum)),
+       legend = levels(factor(df_vh.phylum.mds$phylum)),
        pch = 19,
        cex = 0.7,
-       col = factor(levels(factor(df_rh.phylum.mds$phylum))))
+       col = factor(levels(factor(df_vh.phylum.mds$phylum))))
 ```
 
+```{r}
+p <- ggplot(df_vh.phylum.mds, aes(x = X, y = Y, color = phylum)) +
+  geom_point(size = 2.2) +
+  labs(title = "Gráfico con la matriz VH", x = "Dim.1", y = "Dim.2") +
+  theme(legend.position = "right")  +
+  theme_bw()
+
+# Mostrar el gráfico
+print(p)
+```
 
 
