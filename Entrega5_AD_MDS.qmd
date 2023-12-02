@@ -157,7 +157,7 @@ dist_SP <- sqrt(2*(1-datos_SP))
 Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
 
 ```{r}
-sp.mds<-cmdscale(datos_SP,k=2)
+sp.mds<-cmdscale(dist_SP,k=2)
 ```
 
 Con el resultado del análisis de MDS, creamos el siguiente data frame añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles).
@@ -228,7 +228,7 @@ dist_PM <- sqrt(2*(1-datos_PM))
 Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
 
 ```{r}
-pm.mds<-cmdscale(datos_PM,k=2)
+pm.mds<-cmdscale(dist_PM,k=2)
 ```
 
 Con el resultado del análisis de MDS, creamos el siguiente data frame añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles).
