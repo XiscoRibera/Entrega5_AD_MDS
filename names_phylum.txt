@@ -1,0 +1,15 @@
+numero phylum
+101 Vertebrates
+102 Lancelet
+103 Ascidians
+104 Hechinoderms
+105 Hemichordates
+106 Arthropods
+107 Nematodes
+108 Annelids
+109 Mollusks
+110 Brachiopodas
+111 Flatworms
+112 Cnidarians
+113 Placozoans
+114 Poriferans
