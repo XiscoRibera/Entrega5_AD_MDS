@@ -1,6 +1,8 @@
 ---
 title: "Entrega5 AD: MDS"
-format: html
+format: 
+  html:
+    toc: true
 authors: "Irene LiFeng Julià Pérez i Xisco Ribera Ramis"
 editor: visual
 ---
@@ -19,8 +21,6 @@ editor: visual
 
 **La práctica consiste en representar gráficamente (con solo 2 coordenadas principales) las matrices de similitud generadas por cada kernel coloreando los puntos de acuerdo al grupo de animales de acuerdo a su phylum.**
 
-# Datos
-
 Cargamos las librerías
 
 ```{r, warning=FALSE, message=FALSE}
@@ -28,6 +28,8 @@ library(tidyverse)
 library(ggplot2)
 library(mds)
 ```
+
+# Datos
 
 Cargamos las matrices de datos
 
@@ -225,7 +227,7 @@ Finalmente representemos el gráfico con las coordenadas que hemos calculado ant
 ```{r}
 p <- ggplot(tibble_pm.mds, aes(x = X, y = Y, color = nombre_phylum)) +
   geom_point(size = 2.2) +
-  labs(title = "Gráfico con la matriz SP", x = "Dim.1", y = "Dim.2") +
+  labs(title = "Gráfico con la matriz PM", x = "Dim.1", y = "Dim.2") +
   theme(legend.position = "right")  +
   theme_bw()
 
