@@ -27,7 +27,6 @@ Cargamos las librerías
 library(tidyverse)
 library(ggplot2)
 library(mds)
-library(ggpubr)
 ```
 
 Cargamos las matrices de datos
@@ -48,35 +47,43 @@ rownames(datos_SP) = nombres
 datos_PM = read.table("ANIMALS-matrixPM.txt")
 colnames(datos_PM) = nombres
 rownames(datos_PM) = nombres
+```
 
-names_phylum = read_table("names_phylum.txt", col_types = cols(numero = col_character(), phylum = col_factor()))
-names_phylum$phylum[1]
+A continucaicón cargamos los nombres de los phylums para luego poder etiquetar cada muestra con su correspondiente phylum.
+
+```{r}
+names_phylum = read_table("names_phylum.txt", col_types = cols(numero = col_character(), phylum = col_factor())); names_phylum
 ```
 
 # VH (Vertex histogram)
-Puesto que nos dan la matriz de similaridad, vamos a convertirla en una matatriz de distancias.
+
+Puesto que nos dan la matriz de similaridad, vamos a convertirla en una matriz de distancias.
 
 ```{r}
 dist_VH <- sqrt(2*(1-datos_VH))
 ```
 
-Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
+Tenemos la lista de animales con su phylum y tres matrices de similitud que podemos transformalas facilmente en matrices de distancia. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
+
+Realicemos el MDS:
 
 ```{r}
 vh.mds<-cmdscale(dist_VH,k=2)
 ```
 
-Con el resultado del análisis de MDS, creamos el siguiente data frame añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles).
+Con el resultado del análisis de MDS, creamos el siguiente tibble añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles del 101 al 114). Y luego asignamos a cada factor el nombre del phylum.
 
-```{r}
-tibble_vh.mds = as.tibble(vh.mds); tibble_vh.mds
+```{r, warning=FALSE, message=FALSE}
+tibble_vh.mds = as_tibble(vh.mds)
+head(tibble_vh.mds) # mostramos como es el tibble
 
-tibble_vh.mds = cbind(tibble_vh.mds, as.factor(phylum))
+tibble_vh.mds = cbind(tibble_vh.mds, as.factor(phylum)) # añadimos la variable phylum como un factor
 
 tibble_vh.mds <- tibble_vh.mds %>% 
-  rename(X=V1, Y=V2, phylum = "as.factor(phylum)")
+  rename(X=V1, Y=V2, phylum = "as.factor(phylum)") # renombramos las variables
+head(tibble_vh.mds) # mostramos como queda
 
-tibble_vh.mds = tibble_vh.mds %>% mutate(nombre = case_when(
+tibble_vh.mds = tibble_vh.mds %>% mutate(nombre_phylum = case_when(
   phylum == 101 ~ names_phylum$phylum[1],
   phylum == 102 ~ names_phylum$phylum[2],
   phylum == 103 ~ names_phylum$phylum[3],
@@ -90,29 +97,15 @@ tibble_vh.mds = tibble_vh.mds %>% mutate(nombre = case_when(
   phylum == 111 ~ names_phylum$phylum[11],
   phylum == 112 ~ names_phylum$phylum[12],
   phylum == 113 ~ names_phylum$phylum[13],
-  phylum == 114 ~ names_phylum$phylum[14]))
+  phylum == 114 ~ names_phylum$phylum[14])) # añadimos los nombres de los phylums
 
 tibble_vh.mds %>% glimpse()
 ```
 
+Finalmente representemos el gráfico con las coordenadas que hemos calculado anteriormente:
 
 ```{r}
-df_vh.mds = cbind(data.frame(vh.mds), as.factor(phylum))
-colnames(df_vh.mds) = c("X", "Y", "phylum")
-glimpse(df_vh.mds)
-```
-
-
-```{r, eval = FALSE, echo = FALSE}
-plot(df_vh.mds$X, df_vh.mds$Y, pch = 19, col = factor(df_vh.mds$phylum), xlab = "Dim.1", ylab = "Dim.2")
-legend("topleft",
-       legend = levels(factor(df_vh.mds$phylum)),
-       pch = 19,
-       cex = 0.7,
-       col = factor(levels(factor(df_vh.mds$phylum))))
-```
-```{r, eval=FALSE, echo = FALSE}
-p <- ggplot(df_vh.mds, aes(x = X, y = Y, color = phylum)) +
+p <- ggplot(tibble_vh.mds, aes(x = X, y = Y, color = nombre_phylum)) +
   geom_point(size = 2.2) +
   labs(title = "Gráfico con la matriz VH", x = "Dim.1", y = "Dim.2") +
   theme(legend.position = "right")  +
@@ -121,28 +114,6 @@ p <- ggplot(df_vh.mds, aes(x = X, y = Y, color = phylum)) +
 # Mostrar el gráfico
 print(p)
 ```
-
-```{r}
-p <- ggplot(tibble_vh.mds, aes(x = X, y = Y, color = nombre)) +
-  geom_point(size = 2.2) +
-  labs(title = "Gráfico con la matriz VH", x = "Dim.1", y = "Dim.2") +
-  theme(legend.position = "right")  +
-  theme_bw()
-
-# Mostrar el gráfico
-print(p)
-```
-
-```{r}
-pp <- ggscatter(tibble_vh.mds, x = "X", y = "Y", color = "nombre") +
-  labs(title = "Gráfico con la matriz VH", x = "Dim.1", y = "Dim.2") +
-  theme(legend.position = "right")  +
-  theme_bw()
-
-print(pp)
-```
-
-
 
 Realicemos el mismo procedimiento para las otras dos matrices de similaridad.
 
@@ -154,23 +125,23 @@ Convertimos la matriz "ANIMALS-matrixSP" en una matriz de distancias.
 dist_SP <- sqrt(2*(1-datos_SP))
 ```
 
-Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
+Realicemos el MDS:
 
 ```{r}
 sp.mds<-cmdscale(dist_SP,k=2)
 ```
 
-Con el resultado del análisis de MDS, creamos el siguiente data frame añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles).
+Con el resultado del análisis de MDS, creamos el tibble con el phylum.
 
-```{r}
-tibble_sp.mds = as.tibble(sp.mds); tibble_sp.mds
+```{r, warning=FALSE, message=FALSE}
+tibble_sp.mds = as_tibble(sp.mds)
 
-tibble_sp.mds = cbind(tibble_sp.mds, as.factor(phylum))
+tibble_sp.mds = cbind(tibble_sp.mds, as.factor(phylum)) # añadimos la variable phylum como un factor
 
 tibble_sp.mds <- tibble_sp.mds %>% 
-  rename(X=V1, Y=V2, phylum = "as.factor(phylum)")
+  rename(X=V1, Y=V2, phylum = "as.factor(phylum)") # renombramos las variables
 
-tibble_sp.mds = tibble_sp.mds %>% mutate(nombre = case_when(
+tibble_sp.mds = tibble_sp.mds %>% mutate(nombre_phylum = case_when(
   phylum == 101 ~ names_phylum$phylum[1],
   phylum == 102 ~ names_phylum$phylum[2],
   phylum == 103 ~ names_phylum$phylum[3],
@@ -184,21 +155,15 @@ tibble_sp.mds = tibble_sp.mds %>% mutate(nombre = case_when(
   phylum == 111 ~ names_phylum$phylum[11],
   phylum == 112 ~ names_phylum$phylum[12],
   phylum == 113 ~ names_phylum$phylum[13],
-  phylum == 114 ~ names_phylum$phylum[14]))
+  phylum == 114 ~ names_phylum$phylum[14])) # añadimos los nombres de los phylums
 
 tibble_sp.mds %>% glimpse()
 ```
 
-```{r}
-df_sp.mds = cbind(data.frame(sp.mds), as.factor(phylum))
-colnames(df_sp.mds) = c("X", "Y", "phylum")
-glimpse(df_sp.mds)
-df_sp.mds
-```
-
+Finalmente representemos el gráfico con las coordenadas que hemos calculado anteriormente:
 
 ```{r}
-p <- ggplot(df_sp.mds, aes(x = X, y = Y, color = phylum)) +
+p <- ggplot(tibble_sp.mds, aes(x = X, y = Y, color = nombre_phylum)) +
   geom_point(size = 2.2) +
   labs(title = "Gráfico con la matriz SP", x = "Dim.1", y = "Dim.2") +
   theme(legend.position = "right")  +
@@ -208,14 +173,6 @@ p <- ggplot(df_sp.mds, aes(x = X, y = Y, color = phylum)) +
 print(p)
 ```
 
-```{r}
-pp <- ggscatter(tibble_sp.mds, x = "X", y = "Y", color = "nombre") +
-  labs(title = "Gráfico con la matriz SP", x = "Dim.1", y = "Dim.2") +
-  theme(legend.position = "right")  +
-  theme_bw()
-
-print(pp)
-```
 
 # PM (Pyramid Match)
 
@@ -225,29 +182,58 @@ Convertimos la matriz "ANIMALS-matrixPM" en una matriz de distancias.
 dist_PM <- sqrt(2*(1-datos_PM))
 ```
 
-Tenemos la lista de animales con su phylum y tres matrices de distancias o similitudes. Estas matrices son cuadradas de dimensión 370, que sería el número de observaciones del dataset original.
+Realicemos el MDS:
 
 ```{r}
 pm.mds<-cmdscale(dist_PM,k=2)
 ```
 
-Con el resultado del análisis de MDS, creamos el siguiente data frame añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles).
+Con el resultado del análisis de MDS, creamos el siguiente tibble añadiendo una nueva variable tipo factor que nos indique a que phylum pertenece (14 niveles del 101 al 114).
 
-```{r}
-df_pm.mds = cbind(data.frame(pm.mds), as.factor(phylum))
-colnames(df_pm.mds) = c("X", "Y", "phylum")
-glimpse(df_pm.mds)
+
+Con el resultado del análisis de MDS, creamos el tibble con el phylum.
+
+```{r, warning=FALSE, message=FALSE}
+tibble_pm.mds = as.tibble(pm.mds)
+
+tibble_pm.mds = cbind(tibble_pm.mds, as.factor(phylum)) # añadimos la variable phylum como un factor
+
+tibble_pm.mds <- tibble_pm.mds %>% 
+  rename(X=V1, Y=V2, phylum = "as.factor(phylum)") # renombramos las variables
+
+tibble_pm.mds = tibble_pm.mds %>% mutate(nombre_phylum = case_when(
+  phylum == 101 ~ names_phylum$phylum[1],
+  phylum == 102 ~ names_phylum$phylum[2],
+  phylum == 103 ~ names_phylum$phylum[3],
+  phylum == 104 ~ names_phylum$phylum[4],
+  phylum == 105 ~ names_phylum$phylum[5],
+  phylum == 106 ~ names_phylum$phylum[6],
+  phylum == 107 ~ names_phylum$phylum[7],
+  phylum == 108 ~ names_phylum$phylum[8],
+  phylum == 109 ~ names_phylum$phylum[9],
+  phylum == 110 ~ names_phylum$phylum[10],
+  phylum == 111 ~ names_phylum$phylum[11],
+  phylum == 112 ~ names_phylum$phylum[12],
+  phylum == 113 ~ names_phylum$phylum[13],
+  phylum == 114 ~ names_phylum$phylum[14])) # añadimos los nombres de los phylums
+
+tibble_pm.mds %>% glimpse()
 ```
 
+Finalmente representemos el gráfico con las coordenadas que hemos calculado anteriormente:
 
 ```{r}
-p <- ggplot(df_pm.mds, aes(x = X, y = Y, color = phylum)) +
+p <- ggplot(tibble_pm.mds, aes(x = X, y = Y, color = nombre_phylum)) +
   geom_point(size = 2.2) +
-  labs(title = "Gráfico con la matriz PM", x = "Dim.1", y = "Dim.2") +
+  labs(title = "Gráfico con la matriz SP", x = "Dim.1", y = "Dim.2") +
   theme(legend.position = "right")  +
   theme_bw()
 
 # Mostrar el gráfico
 print(p)
 ```
+
+# Conclusión
+
+Realizando un MDS hemos podido reducir la dimensionalidad de las distancias observadas y hemos podido observar mediante una representación gráfica la dispersión de las muestras en función del `phylum` en dimensión 2, que se mantiene fiel de la estructura observada.
 
